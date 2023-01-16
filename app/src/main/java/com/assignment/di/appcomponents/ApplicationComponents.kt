@@ -6,5 +6,5 @@ import org.koin.core.module.Module
 val appComponent: List<Module> = listOf(
      retrofitModule,
     okhttpModule, repositoryModule,
-     apiModule, viewModelModule, useCaseModule
+     apiModule, viewModelModule, sharedPrefModule,useCaseModule
 )

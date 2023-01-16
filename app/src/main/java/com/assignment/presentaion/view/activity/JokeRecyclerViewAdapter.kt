@@ -27,6 +27,6 @@ class JokeRecyclerViewAdapter<T> : BindingRecyclerViewAdapter<T>() {
     ) {
         super.onBindBinding(binding, variableId, layoutRes, position, item)
         Log.d("RecyclerAdapter", "bound binding: $binding at position: $position")
-  binding
+
     }
 }

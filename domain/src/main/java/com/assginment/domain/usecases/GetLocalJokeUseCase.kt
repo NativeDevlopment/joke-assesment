@@ -4,6 +4,7 @@ import com.assginment.domain.common.ResultState
 import com.assginment.domain.entity.JokeEntity
 import kotlinx.coroutines.flow.Flow
 
-interface GetJokeUseCase {
-     fun  excute (): Flow<ResultState<List<JokeEntity>>>
+interface GetLocalJokeUseCase {
+    fun  excute (): Flow<ResultState<List<JokeEntity>>>
+
 }

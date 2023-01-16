@@ -1,8 +1,18 @@
 package com.assignment.presentaion.viewmodel
 
+import android.content.Context
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.assginment.domain.common.ResultState
+import com.assginment.domain.common.Status
+import com.assginment.domain.entity.JokeEntity
 import com.assginment.domain.usecases.GetJokeUseCase
+import com.assginment.domain.usecases.GetLocalJokeUseCase
 import com.assignment.R
 import com.assignment.BR
 import com.assignment.presentaion.base.BaseViewModel
@@ -13,9 +23,9 @@ import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
-class JokesViewModel (val getJokeUseCase: GetJokeUseCase) :BaseViewModel(){
+class JokesViewModel (val getJokeUseCase: GetJokeUseCase ,val getLocalJokeUseCase: GetLocalJokeUseCase) :BaseViewModel(){
     val items = MergeObservableList<Any>()
-
+val  resultLiveData=  MutableLiveData<ResultState<List<JokeEntity>>>()
     private val multipleItemBindings =
         OnItemBind<Any> { itemBinding, _, item ->
 
@@ -24,22 +34,29 @@ class JokesViewModel (val getJokeUseCase: GetJokeUseCase) :BaseViewModel(){
     val itemBinding = ItemBinding.of(multipleItemBindings)
     val adapter = JokeRecyclerViewAdapter<Any>()
     init {
-       // items.insertItem("test")
-        viewModelScope.launch {
-            var count=1;
-            while (true){
-            delay(5000)
-                if(count>=10){
+        resultLiveData.value= ResultState(Status.LOADING,null,null)
 
-                    items.removeItem(items.get(0))
+        // items.insertItem("test")
+        viewModelScope.launch {
+            getLocalJokeUseCase.excute().collect{result->
+                if(result.data!=null){
+                    resultLiveData.value=result
+                    adapter.setItems(result.data)
                 }
-                getJokeUseCase.excute().collect{
-                   Log.e("test",""+it)
-                    if(it.data!=null){
-                    items.insertItem( it.data)
-                        count++;
+            }
+            while (true){
+                delay(60000)
+                getJokeUseCase.excute().collect{ result->
+                    resultLiveData.value=result
+
+                        if(result.data!=null){
+
+                            adapter.setItems(result.data)
+                            adapter.notifyDataSetChanged()
+                        }
                     }
-                }
+
+
            // items.insertItem("test1$count")
             }
 
